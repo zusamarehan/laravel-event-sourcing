@@ -1,3 +1,8 @@
+@if (session('status'))
+    <div class="alert alert-success">
+        {{ session('status') }}
+    </div>
+@endif
 <form action="{{route('project.store')}}" method="post">
     <input type="text" name="_token" value="{{csrf_token()}}" hidden>
     <input type="text" name="module" value="Project" hidden>
@@ -16,7 +21,11 @@
     <button type="submit">Create</button>
 </form>
 
-
 <div>
-    {{ \App\EventLog::all() }}
+    <ul></ul>
+    @foreach(\App\Project::get() as $project)
+        <li>
+            <a href="project/{{$project->id}}">{{ $project->title }}</a>
+        </li>
+    @endforeach
 </div>

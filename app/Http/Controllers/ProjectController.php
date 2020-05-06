@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\Aggregators\Project\ProjectAggregateRoot;
+use App\Domain\Command\UpdateCurrentCommand;
 use App\Http\Requests\ProjectRequest;
-use App\Command\ProjectCommandHandler;
 use App\Project;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Event;
+use Illuminate\View\View;
 
 class ProjectController extends Controller
 {
@@ -35,22 +39,30 @@ class ProjectController extends Controller
      * Store a newly created resource in storage.
      *
      * @param ProjectRequest $request
-     * @return void
      */
     public function store(ProjectRequest $request)
     {
+        (new UpdateCurrentCommand($request->get('_pudding_command')))('processing', 'OK');
 
+        $aggregate = new ProjectAggregateRoot($request->except(['_token', 'module','_pudding_command']));
+        $uuid = $aggregate->store();
+
+        (new UpdateCurrentCommand($request->get('_pudding_command')))('processed', $uuid);
+
+        return redirect()->back()->with('status', 'Project Created');
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
-     * @return Response
+     * @param Project $project
+     * @return Application|Factory|View
      */
-    public function show($id)
+    public function show(Project $project)
     {
-        //
+        return view('project.show', [
+            'project' => $project
+        ]);
     }
 
     /**
@@ -67,13 +79,20 @@ class ProjectController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param Request $request
-     * @param  int  $id
-     * @return Response
+     * @param ProjectRequest $request
+     * @param int $id
+     * @return RedirectResponse
      */
-    public function update(Request $request, $id)
+    public function update(ProjectRequest $request, $id)
     {
-        //
+        (new UpdateCurrentCommand($request->get('_pudding_command')))('processing', 'OK');
+
+        $aggregate = new ProjectAggregateRoot($request->except(['_token', 'module', '_pudding_command', '_method']));
+        $aggregate->update();
+
+        (new UpdateCurrentCommand($request->get('_pudding_command')))('processed', $request->get('uuid'));
+
+        return redirect()->back()->with('status', 'Project Updated');
     }
 
     /**
