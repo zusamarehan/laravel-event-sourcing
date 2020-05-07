@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Events\SyncEvent;
+use App\Listeners\DoThisFirst;
+use App\Listeners\DoThisSecond;
+use App\Listeners\DoThisThird;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -18,6 +22,11 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
+        SyncEvent::class => [
+            DoThisFirst::class,
+            DoThisSecond::class,
+            DoThisThird::class
+        ]
     ];
 
     /**
@@ -39,6 +48,6 @@ class EventServiceProvider extends ServiceProvider
      */
     public function shouldDiscoverEvents()
     {
-        return true;
+        return false;
     }
 }

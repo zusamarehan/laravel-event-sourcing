@@ -13,6 +13,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// Trying out Sync in Event & Listeners
+Route::get('sync', function() {
+   event(new \App\Events\SyncEvent());
+});
+
 Route::apiResource('project', 'ProjectController');
 
 Route::get('/', function () {
