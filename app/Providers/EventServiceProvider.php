@@ -2,10 +2,16 @@
 
 namespace App\Providers;
 
+use App\Events\ProjectCreatedEvent;
+use App\Events\ProjectDealUpdatedEvent;
+use App\Events\ProjectTitleUpdatedEvent;
 use App\Events\SyncEvent;
 use App\Listeners\DoThisFirst;
 use App\Listeners\DoThisSecond;
 use App\Listeners\DoThisThird;
+use App\Listeners\ProcessProjectCreateListener;
+use App\Listeners\ProcessProjectUpdateDealListener;
+use App\Listeners\ProcessProjectUpdateTitleListener;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -21,6 +27,15 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         Registered::class => [
             SendEmailVerificationNotification::class,
+        ],
+        ProjectCreatedEvent::class => [
+            ProcessProjectCreateListener::class
+        ],
+        ProjectDealUpdatedEvent::class => [
+            ProcessProjectUpdateDealListener::class
+        ],
+        ProjectTitleUpdatedEvent::class => [
+            ProcessProjectUpdateTitleListener::class
         ],
         SyncEvent::class => [
             DoThisFirst::class,
